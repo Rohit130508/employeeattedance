@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.home.HomeFragment">
+
+   <Button
+       android:id="@+id/btnSignIn"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:text="Sign In"
+       android:background="@color/colorAccent"/>
+
+    <Button
+        android:layout_marginTop="9dp"
+        android:layout_below="@+id/btnSignIn"
+        android:id="@+id/btnSignOut"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SignOut"
+        android:background="@color/colorAccent"/>
+</RelativeLayout>
