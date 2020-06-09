@@ -31,5 +31,5 @@ public interface APIInterface {
             "Authorization: Basic YWRtaW46YWRtaW5AaG90c3BvdA=="
     })
     @POST("verify-phone")
-    Call<VerifyPhoneModal> doVerifyPhoneStatus( @Field("phone") String phone);
+    Call<VerifyPhoneModal> doVerifyPhoneStatus(@Field("phone") String phone);
 }

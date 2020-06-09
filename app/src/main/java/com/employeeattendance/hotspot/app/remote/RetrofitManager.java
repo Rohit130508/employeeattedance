@@ -11,7 +11,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-class RetrofitManager {
+public class RetrofitManager {
 
     private static Retrofit retrofit;
     public static String BASE_URL = AppUrl.BaseUrl;
