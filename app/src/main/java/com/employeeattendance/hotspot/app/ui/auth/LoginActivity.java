@@ -1,105 +1,159 @@
 package com.employeeattendance.hotspot.app.ui.auth;
 
-import android.os.Bundle;
-import android.widget.EditText;
-
-import com.employeeattendance.hotspot.app.R;
-import com.employeeattendance.hotspot.app.appconstants.Utils;
-
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.employeeattendance.hotspot.app.ApiEndPoint.ApiInterface;
+import com.employeeattendance.hotspot.app.ApiEndPoint.Apiclient;
+import com.employeeattendance.hotspot.app.MainActivity;
+import com.employeeattendance.hotspot.app.Model.WebResponse;
+import com.employeeattendance.hotspot.app.R;
+import com.employeeattendance.hotspot.app.StoreManager;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+
+import java.util.ArrayList;
 
 public class LoginActivity extends AppCompatActivity {
 
-    EditText edtNumber;
-    private String mobileNumber;
-//    public static Retrofit apiManager;
-//    public static Retrofit apiManager;
+    private TextView lblAccountLogin;
+    private TextView textViewForgotPassword;
+    private TextView textViewCreateAccount;
+    private TextView lblRememberPassword;
+    private TextInputEditText editTextMobileNo;
+    private TextInputEditText editTextPassword;
+    private TextInputLayout layoutPassword;
+    private CheckBox checkBoxRememberPassword;
+    private static ApiInterface mApiclient;
+    Button login_here;
+    Button signup;
+    TextView forget;
+    EditText login_number;
+    EditText login_password;
+    StoreManager storeManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setTheme(R.style.AppTheme);
         setContentView(R.layout.activity_login);
 
-//        apiManager = RetrofitManager.getInstance();
+//        getSupportActionBar().setTitle("Login");
+        login_here = findViewById(R.id.login_here);
+        signup = findViewById(R.id.signup);
+        forget = findViewById(R.id.forget);
+        login_number = findViewById(R.id.login_number);
+        login_password = findViewById(R.id.login_password);
+        mApiclient = Apiclient.getClient(getApplicationContext());
+        storeManager = new StoreManager(getApplicationContext());
 
-        edtNumber = findViewById(R.id.edtNumber);
-        findViewById(R.id.cardNavigate).setOnClickListener(v->  checkPhoneStatus());
+
+        forget.setOnClickListener(v -> {
+//            Intent intent = new Intent(LoginActivity.this, ForgetPasswordActivity.class);
+//            startActivity(intent);
+        });
+        signup.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
+            startActivity(intent);
+        });
+
+        login_here.setOnClickListener(v -> {
+            if(validate() == true) {
+                postLoginData(getString(R.string.Auth_key),getString(R.string.Api_key),login_password.getText().toString(), login_number.getText().toString());
+            }
+        });
+
 
     }
 
-//    void getAuthorizationDemo() {
-//
-//        Utils.customProgress(LoginActivity.this,"Please Wait...");
-//        String URL = AppUrl.VerifyPhone;
-//
-//        StringRequest request = new StringRequest(Request.Method.POST, URL,
-//                response -> {
-//
-//                    Utils.customProgressStop();
-//                    System.out.println("responce==>>"+response+""+mobileNumber);
-//                    try {
-//                        JSONObject jsonObject = new JSONObject(response);
-//                        if (jsonObject.getBoolean("status"))
-//                        {
-//                            startActivity(new Intent(LoginActivity.this,SignIn.class)
-//                            .putExtra("Number",mobileNumber));
-//                        }
-//                        else
-//                        {
-//                            startActivity(new Intent(LoginActivity.this,SignUp.class)
-//                                    .putExtra("Number",mobileNumber));
-//                        }
-//
-//                    }catch (Exception ignored){}
-//                },
-//                error -> {
-//                    Utils.customProgressStop();
-//
-//                    System.out.println("err"+error.getMessage());
-//
-//                })
-//        {
-//
-//            @Override
-//            public Map<String, String> getHeaders() {
-//                Map<String, String> headers = new HashMap<>();
-//                headers.put("Content-Type", "multipart/form-data");
-//                headers.put("x-api-key", "25d55ad283aa400af464c76d713c07ad");
-//                headers.put("Authorization", "Basic YWRtaW46YWRtaW5AaG90c3BvdA==");
-//                return headers;
-//            }
-//
-//            @Override
-//            protected Map<String,String> getParams(){
-//                Map<String,String> params = new HashMap<>();
-//                params.put("phone","9453284838");
-//                return params;
-//            }
-//        };
-//
-//        RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
-//        request.setRetryPolicy(new
-//                DefaultRetryPolicy(20 * 1000, 2,
-//                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-//        queue.add(request);
-//
-//
-//
-//    }
+    private void postLoginData(String Authkey,String Apikey,String password,String phone){
+        mApiclient.getLogin(Authkey,Apikey,password, phone).enqueue(new Callback<WebResponse>() {
 
+            @Override
+            public void onResponse(Call<WebResponse> call, Response<WebResponse> response) {
+                if (response.isSuccessful()) {
+                    WebResponse webResponse = response.body();
+                    Boolean status = webResponse.getStatus();
+                    String msg = webResponse.getMessage();
+                    System.out.println("message"+msg);
+                    if (status == true) {
+                        storeManager.setLoginStatus(true);
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                    }else {
+                        Toast.makeText(getApplicationContext(),msg,Toast.LENGTH_SHORT).show();
+                    }
+                }else {
+                    Toast.makeText(getApplicationContext(),"Wrong email or password",Toast.LENGTH_SHORT).show();
+                }
+            }
 
-    void getAuthorizationDemo()
-    {
-//        Call call = apiManager.doVerifyPhoneStatus();
+            @Override
+            public void onFailure(Call<WebResponse> call, Throwable t) {
+                Toast.makeText(getApplicationContext(),"Something Went wrong.Please wait.",Toast.LENGTH_SHORT).show();
+            }
+        });
     }
-    void checkPhoneStatus()
-    {
-        mobileNumber = edtNumber.getText().toString().trim();
+    public boolean validate() {
 
-        if(Utils.isNetworkAvailable(LoginActivity.this))
-        getAuthorizationDemo();
+//        String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+        boolean valid = false;
 
+        String Phone= login_number.getText().toString();
+        String Password= login_password.getText().toString();
+        if (Phone.isEmpty()) {
+            valid = false;
+            login_number.setError("Please enter valid mobile no");
+        }
+        else if (Phone.length()!= 10) {
+            valid = false;
+            login_number.setError("Please enter valid valid number");
+            login_number.requestFocus();
+
+        }
+//        else if(!Phone.matches(emailPattern)){
+//            valid = false;
+//            login_email.setError("Please enter valid email");
+//        }
+//        else if (!Phone)
+        else if (Password.isEmpty()) {
+            valid = false;
+            login_password.setError("Please enter valid password!");
+            login_password.requestFocus();
+        }
+        else if (Password.length() < 5) {
+            valid = false;
+            login_password.setError("more than 5");
+            login_password.requestFocus();
+
+        } else {
+            System.out.println("gycgcxgfcgfcgfc");
+            valid = true;
+        }
+
+        return valid;
+    }
+
+    @Override
+    public boolean onNavigateUp() {
+        onBackPressed();
+        return super.onNavigateUp();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 }

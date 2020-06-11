@@ -6,6 +6,10 @@
     <string name="title_notifications">Notifications</string>
 
 
+    <string name="Api_key">25d55ad283aa400af464c76d713c07ad</string>
+    <string name="Auth_key">Basic YWRtaW46YWRtaW5AaG90c3BvdA==</string>
+    <string name="Base_url">"http://hotspotgroup.in"</string>
+
     <string name="hotspotdrive">https://play.google.com/store/apps/details?id=com.hotspot.driver</string>
     <string name="hotspot">https://play.google.com/store/apps/details?id=com.hotspot.driver</string>
 
